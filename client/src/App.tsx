@@ -1,18 +1,25 @@
 import React from "react";
 import { Typography, Grid, TextField, Button } from "@mui/material";
 
+interface Response {
+  result: number;
+}
+
 function App() {
   const [number, setNumber] = React.useState<string>("");
   const [result, setResult] = React.useState<number | null>(null);
-  console.log(number);
 
   const getFibonacci = async () => {
     if (number === "") return;
-    const response = await fetch(
-      `http://localhost:8080/api/fibonacci/${number}`
-    );
-    const res = await response.json();
-    setResult(res.result);
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/fibonacci/${number}`
+      );
+      const res = (await response.json()) as any as Response;
+      setResult(res.result);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -37,8 +44,10 @@ function App() {
       >
         <TextField
           id="outlined-basic"
+          placeholder="Number"
           label="Number"
           variant="filled"
+          data-testid="input"
           sx={{
             backgroundColor: "whitesmoke",
             margin: 2,
@@ -54,6 +63,7 @@ function App() {
           }}
           disabled={number === ""}
           onClick={getFibonacci}
+          data-testid="button"
         >
           Calculate
         </Button>
@@ -62,6 +72,7 @@ function App() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography
+              data-testid="result"
               variant="h5"
               component="h2"
               sx={{ textAlign: "center", margin: 4, color: "whitesmoke" }}
